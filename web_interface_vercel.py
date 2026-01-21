@@ -31,8 +31,8 @@ HTML_TEMPLATE = """
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #000000;
-            color: #ffffff;
+            background: #0a0a0a;
+            color: #e8e8e8;
             min-height: 100vh;
             padding: 40px 20px;
             line-height: 1.6;
@@ -47,7 +47,7 @@ HTML_TEMPLATE = """
             text-align: center;
             margin-bottom: 60px;
             padding-bottom: 30px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #2a2a2a;
         }
 
         .header h1 {
@@ -59,7 +59,7 @@ HTML_TEMPLATE = """
         }
 
         .header p {
-            color: #888;
+            color: #999;
             font-size: 1em;
             font-weight: 300;
         }
@@ -78,14 +78,14 @@ HTML_TEMPLATE = """
         }
 
         .card {
-            background: #111111;
-            border: 1px solid #222;
+            background: #141414;
+            border: 1px solid #2a2a2a;
             padding: 40px;
             transition: border-color 0.3s;
         }
 
         .card:hover {
-            border-color: #444;
+            border-color: #3a3a3a;
         }
 
         .card h2 {
@@ -151,9 +151,9 @@ HTML_TEMPLATE = """
         .success-message {
             display: none;
             padding: 15px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            color: #fff;
+            background: #1a2a1a;
+            border: 1px solid #2a4a2a;
+            color: #8fce8f;
             margin-bottom: 20px;
             font-size: 0.9em;
         }
@@ -163,8 +163,8 @@ HTML_TEMPLATE = """
         }
 
         .info-box {
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
             padding: 20px;
             margin-top: 20px;
         }
@@ -184,9 +184,9 @@ HTML_TEMPLATE = """
 
         .info-list li {
             padding: 10px 0;
-            color: #888;
+            color: #aaa;
             font-size: 0.9em;
-            border-bottom: 1px solid #1a1a1a;
+            border-bottom: 1px solid #222;
         }
 
         .info-list li:last-child {
@@ -203,26 +203,27 @@ HTML_TEMPLATE = """
         }
 
         .files-list::-webkit-scrollbar-track {
-            background: #0a0a0a;
+            background: #0f0f0f;
         }
 
         .files-list::-webkit-scrollbar-thumb {
-            background: #333;
+            background: #3a3a3a;
         }
 
         .file-item {
             padding: 20px;
-            border: 1px solid #222;
+            border: 1px solid #2a2a2a;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.2s;
+            background: #0f0f0f;
         }
 
         .file-item:hover {
-            border-color: #444;
-            background: #0a0a0a;
+            border-color: #3a3a3a;
+            background: #1a1a1a;
         }
 
         .file-info {
@@ -238,7 +239,7 @@ HTML_TEMPLATE = """
 
         .file-date {
             font-size: 0.85em;
-            color: #666;
+            color: #888;
         }
 
         .file-actions {
@@ -248,9 +249,9 @@ HTML_TEMPLATE = """
 
         .btn-small {
             padding: 10px 20px;
-            border: 1px solid #333;
-            background: transparent;
-            color: #fff;
+            border: 1px solid #3a3a3a;
+            background: #1a1a1a;
+            color: #e8e8e8;
             cursor: pointer;
             font-size: 0.85em;
             transition: all 0.2s;
@@ -259,7 +260,7 @@ HTML_TEMPLATE = """
 
         .btn-small:hover {
             background: #ffffff;
-            color: #000000;
+            color: #0a0a0a;
             border-color: #ffffff;
         }
 
@@ -283,8 +284,8 @@ HTML_TEMPLATE = """
         }
 
         .modal-content {
-            background: #111111;
-            border: 1px solid #333;
+            background: #141414;
+            border: 1px solid #2a2a2a;
             padding: 40px;
             max-width: 900px;
             max-height: 90vh;
@@ -297,11 +298,11 @@ HTML_TEMPLATE = """
         }
 
         .modal-content::-webkit-scrollbar-track {
-            background: #0a0a0a;
+            background: #0f0f0f;
         }
 
         .modal-content::-webkit-scrollbar-thumb {
-            background: #333;
+            background: #3a3a3a;
         }
 
         .modal-header {
@@ -310,7 +311,7 @@ HTML_TEMPLATE = """
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid #2a2a2a;
         }
 
         .modal-header h2 {
@@ -320,9 +321,9 @@ HTML_TEMPLATE = """
         }
 
         .modal-close {
-            background: transparent;
-            color: #666;
-            border: 1px solid #333;
+            background: #1a1a1a;
+            color: #aaa;
+            border: 1px solid #3a3a3a;
             padding: 8px 20px;
             cursor: pointer;
             font-size: 0.9em;
@@ -331,19 +332,19 @@ HTML_TEMPLATE = """
 
         .modal-close:hover {
             background: #ffffff;
-            color: #000000;
+            color: #0a0a0a;
             border-color: #ffffff;
         }
 
         .post-item {
             padding: 25px;
-            border: 1px solid #222;
+            border: 1px solid #2a2a2a;
             margin-bottom: 20px;
-            background: #0a0a0a;
+            background: #0f0f0f;
         }
 
         .post-number {
-            color: #666;
+            color: #888;
             font-weight: 400;
             font-size: 0.85em;
             margin-bottom: 15px;
@@ -352,7 +353,7 @@ HTML_TEMPLATE = """
         }
 
         .post-content {
-            color: #ffffff;
+            color: #e8e8e8;
             line-height: 1.8;
             white-space: pre-wrap;
             margin-bottom: 20px;
@@ -360,9 +361,9 @@ HTML_TEMPLATE = """
         }
 
         .copy-btn {
-            background: transparent;
-            color: #fff;
-            border: 1px solid #333;
+            background: #1a1a1a;
+            color: #e8e8e8;
+            border: 1px solid #3a3a3a;
             padding: 10px 20px;
             cursor: pointer;
             font-size: 0.85em;
@@ -371,7 +372,7 @@ HTML_TEMPLATE = """
 
         .copy-btn:hover {
             background: #ffffff;
-            color: #000000;
+            color: #0a0a0a;
             border-color: #ffffff;
         }
 
@@ -385,11 +386,11 @@ HTML_TEMPLATE = """
         .status-line {
             text-align: center;
             padding: 15px;
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
             margin-bottom: 20px;
             font-size: 0.85em;
-            color: #888;
+            color: #999;
         }
     </style>
 </head>

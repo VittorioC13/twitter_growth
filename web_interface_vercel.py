@@ -68,12 +68,18 @@ HTML_TEMPLATE = """
 
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 40px;
             margin-bottom: 40px;
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
@@ -394,6 +400,66 @@ HTML_TEMPLATE = """
             font-size: 0.85em;
             color: #999;
         }
+
+        .tutorial-btn {
+            width: 100%;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e8e8e8;
+            border: 1px solid #3a3a3a;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-btn:hover {
+            background: #2a2a2a;
+            border-color: #4a4a4a;
+        }
+
+        .tutorial-content {
+            line-height: 1.9;
+            color: #d0d0d0;
+        }
+
+        .tutorial-content h3 {
+            color: #ffffff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .tutorial-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .tutorial-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tutorial-content li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #aaa;
+        }
+
+        .tutorial-content li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #666;
+        }
+
+        .tutorial-content p {
+            margin-bottom: 15px;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -444,6 +510,23 @@ HTML_TEMPLATE = """
                     </div>
                 </div>
             </div>
+
+            <div class="card">
+                <h2>Tutorial</h2>
+                <button class="tutorial-btn" onclick="openTutorial()">
+                    View Monetization Guide
+                </button>
+                <div class="info-box">
+                    <h3>Learn How To</h3>
+                    <ul class="info-list">
+                        <li>Set up Twitter account</li>
+                        <li>Get blue verification</li>
+                        <li>Build 500+ followers</li>
+                        <li>Setup payment methods</li>
+                        <li>Start earning</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -454,6 +537,46 @@ HTML_TEMPLATE = """
                 <button class="modal-close" onclick="closeModal()">Close</button>
             </div>
             <div id="postsContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="tutorialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Twitter Monetization Guide</h2>
+                <button class="modal-close" onclick="closeTutorialModal()">Close</button>
+            </div>
+            <div class="tutorial-content">
+                <h3>1. 新号注册准备</h3>
+                <ul>
+                    <li>手机号：需境外手机号（+86号段无法申请蓝V）。推荐使用接码平台如sms-activate.io（单次费用约1.5人民币）或开通国际漫游的中国手机卡。</li>
+                    <li>邮箱：推荐使用Gmail或Outlook邮箱，Hotmail邮箱可能存在账号不稳定问题。</li>
+                    <li>账号设置：头像、横幅照片、个人介绍需完善。可使用AI工具辅助生成头像及介绍内容。</li>
+                </ul>
+
+                <h3>2. 蓝V认证流程</h3>
+                <ul>
+                    <li>蓝V订阅：网页端订阅（电脑或手机浏览器）操作，价格为8美元/月或84美元/年（推荐选择年度订阅，成本较低）。</li>
+                    <li>支付方式：可使用国内双币信用卡（Visa/Mastercard），或通过支付宝、微信购买虚拟信用卡（费用约70-80人民币）。</li>
+                </ul>
+
+                <h3>3. 起号阶段操作</h3>
+                <ul>
+                    <li>内容发布：前10天需围绕账号定位发布3-5条内容（如交易、投资等垂直领域），使用DeepSeek、ChatGPT等工具辅助生成。</li>
+                    <li>活跃度积累：通过关注相关账号、点赞转发评论日区帖子积累，评论超100条后易找到规律；刷量阶段无粉丝，不会影响他人时间线。</li>
+                    <li>500个蓝V粉丝积累：通过互关群进行互关，筛选最新发布的互关帖，避免选择发布超一天的内容；控制互关频率，每小时约10个，每天100-200个；互关前需查看对方主页，防止被系统判定为机器人。</li>
+                </ul>
+
+                <h3>4. 收款账号准备</h3>
+                <ul>
+                    <li>收益需通过Stripe账号收款，该账号不支持绑定内地银行卡，需境外银行卡。</li>
+                    <li>国内用户可通过申请香港银行卡，或借助Wise注册账户并添加港元收款账户（非香港银行卡）的方式解决；有条件的话，建议亲自去香港办卡，更为便捷。</li>
+                </ul>
+
+                <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a2a; color: #666; font-size: 0.9em;">
+                    Original source: <a href="https://x.com/akokoi1/status/2009899992149111082" target="_blank" style="color: #888; text-decoration: underline;">@akokoi1 on Twitter</a>
+                </p>
+            </div>
         </div>
     </div>
 
@@ -545,6 +668,14 @@ HTML_TEMPLATE = """
 
         function closeModal() {
             document.getElementById('postsModal').classList.remove('active');
+        }
+
+        function openTutorial() {
+            document.getElementById('tutorialModal').classList.add('active');
+        }
+
+        function closeTutorialModal() {
+            document.getElementById('tutorialModal').classList.remove('active');
         }
 
         function copyToClipboard(text) {

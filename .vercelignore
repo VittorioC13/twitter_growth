@@ -1,0 +1,8 @@
+# Files to ignore during Vercel deployment
+.env
+__pycache__/
+Output/
+*.bat
+venv/
+env/
+.git/

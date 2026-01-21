@@ -1,6 +1,6 @@
 """
 Web interface for Twitter Content Generator - VERCEL OPTIMIZED
-Generates 5 posts instead of 10 to fit within Vercel's 10-second timeout
+Clean, zen, black and white design
 """
 from flask import Flask, render_template_string, jsonify, send_file, request
 import os
@@ -14,7 +14,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# HTML Template - Same as before but updated for 5 posts
+# HTML Template - Clean Black & White Zen Design
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -23,127 +23,246 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitter Content Generator</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1DA1F2 0%, #14171A 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            color: #ffffff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            line-height: 1.6;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
         .header {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
             text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #333;
         }
-        .header h1 { color: #1DA1F2; font-size: 2.5em; margin-bottom: 10px; }
-        .header p { color: #657786; font-size: 1.1em; }
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-top: 10px;
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            color: #ffffff;
         }
-        .status-ready { background: #17BF63; color: white; }
-        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
+
+        .header p {
+            color: #888;
+            font-size: 1em;
+            font-weight: 300;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            background: #111111;
+            border: 1px solid #222;
+            padding: 40px;
+            transition: border-color 0.3s;
         }
-        .card h2 { color: #14171A; margin-bottom: 20px; font-size: 1.5em; }
+
+        .card:hover {
+            border-color: #444;
+        }
+
+        .card h2 {
+            font-size: 1.3em;
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
         .generate-btn {
             width: 100%;
-            padding: 18px;
-            background: #1DA1F2;
-            color: white;
+            padding: 20px;
+            background: #ffffff;
+            color: #000000;
             border: none;
-            border-radius: 12px;
-            font-size: 1.2em;
-            font-weight: 600;
+            font-size: 1em;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
         }
+
         .generate-btn:hover {
-            background: #1A91DA;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(29, 161, 242, 0.4);
+            background: #f5f5f5;
+            transform: translateY(-1px);
         }
-        .generate-btn:disabled { background: #AAB8C2; cursor: not-allowed; transform: none; }
-        .loading { display: none; text-align: center; padding: 20px; color: #657786; }
-        .loading.active { display: block; }
+
+        .generate-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #1DA1F2;
-            border-radius: 50%;
             width: 40px;
             height: 40px;
+            border: 2px solid #222;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 15px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .files-list { max-height: 400px; overflow-y: auto; }
-        .file-item {
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            display: none;
             padding: 15px;
-            border: 1px solid #E1E8ED;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .info-box {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 10px 0;
+            color: #888;
+            font-size: 0.9em;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .files-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .files-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .files-list::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .files-list::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
+        .file-item {
+            padding: 20px;
+            border: 1px solid #222;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.2s;
         }
-        .file-item:hover { background: #F7F9FA; border-color: #1DA1F2; }
-        .file-info { flex: 1; }
-        .file-name { font-weight: 600; color: #14171A; margin-bottom: 5px; }
-        .file-date { font-size: 0.9em; color: #657786; }
-        .file-actions { display: flex; gap: 10px; }
+
+        .file-item:hover {
+            border-color: #444;
+            background: #0a0a0a;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 400;
+            color: #ffffff;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .file-date {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
         .btn-small {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border: 1px solid #333;
+            background: transparent;
+            color: #fff;
             cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
+            font-size: 0.85em;
             transition: all 0.2s;
+            font-weight: 400;
         }
-        .btn-view { background: #1DA1F2; color: white; }
-        .btn-view:hover { background: #1A91DA; }
-        .btn-download { background: #17BF63; color: white; }
-        .btn-download:hover { background: #12A356; }
-        .success-message {
-            display: none;
-            padding: 15px;
-            background: #E8F5E9;
-            color: #2E7D32;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-weight: 600;
+
+        .btn-small:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
         }
-        .success-message.active { display: block; }
-        .info-box {
-            background: #F7F9FA;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-        .info-box h3 { color: #14171A; margin-bottom: 10px; font-size: 1.1em; }
-        .info-box ul { list-style: none; padding: 0; }
-        .info-box li {
-            padding: 8px 0;
-            color: #657786;
-            border-bottom: 1px solid #E1E8ED;
-        }
-        .info-box li:last-child { border-bottom: none; }
-        .info-box strong { color: #14171A; }
+
         .modal {
             display: none;
             position: fixed;
@@ -152,108 +271,164 @@ HTML_TEMPLATE = """
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
         }
-        .modal.active { display: flex; justify-content: center; align-items: center; }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
         .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 800px;
-            max-height: 80vh;
+            background: #111111;
+            border: 1px solid #333;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 90vh;
             overflow-y: auto;
-            width: 90%;
+            width: 100%;
         }
+
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
         }
+
+        .modal-header h2 {
+            font-size: 1.3em;
+            font-weight: 400;
+            color: #ffffff;
+        }
+
         .modal-close {
-            background: #E0245E;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: transparent;
+            color: #666;
+            border: 1px solid #333;
+            padding: 8px 20px;
             cursor: pointer;
-            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
         }
+
+        .modal-close:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
         .post-item {
-            padding: 20px;
-            border: 1px solid #E1E8ED;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background: #F7F9FA;
+            padding: 25px;
+            border: 1px solid #222;
+            margin-bottom: 20px;
+            background: #0a0a0a;
         }
+
         .post-number {
-            color: #1DA1F2;
-            font-weight: 700;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-        .post-content {
-            color: #14171A;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            margin-bottom: 10px;
-        }
-        .copy-btn {
-            background: #1DA1F2;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        .copy-btn:hover { background: #1A91DA; }
-        .vercel-badge {
-            background: #FFE5E5;
-            color: #E0245E;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 0.9em;
+            color: #666;
+            font-weight: 400;
+            font-size: 0.85em;
             margin-bottom: 15px;
-            border-left: 4px solid #E0245E;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .post-content {
+            color: #ffffff;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .status-line {
+            text-align: center;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            margin-bottom: 20px;
+            font-size: 0.85em;
+            color: #888;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🐦 Twitter Content Generator</h1>
-            <p>AI-Powered Viral Trading Content for Twitter (Vercel Optimized)</p>
-            <div class="status-badge status-ready">✓ Ready to Generate</div>
+            <h1>Twitter Content Generator</h1>
+            <p>AI-powered trading content for Twitter</p>
         </div>
 
-        <div class="main-content">
+        <div class="main-grid">
             <div class="card">
-                <h2>Generate Content</h2>
-                <div class="vercel-badge">
-                    ⚡ Vercel-Optimized: Generates 5 posts in ~7-10 seconds
+                <h2>Generate</h2>
+
+                <div class="status-line">
+                    Optimized for 5 posts / ~8 second generation
                 </div>
+
                 <div class="success-message" id="successMessage">
-                    ✓ Content generated successfully!
+                    Generation complete
                 </div>
+
                 <button class="generate-btn" id="generateBtn" onclick="generateContent()">
-                    🚀 Generate 5 Posts Now
+                    Generate 5 Posts
                 </button>
+
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p>Generating viral trading content...</p>
-                    <p style="font-size: 0.9em;">This takes about 7-10 seconds</p>
+                    <p>Generating content...</p>
                 </div>
 
                 <div class="info-box">
-                    <h3>What Gets Generated:</h3>
-                    <ul>
-                        <li><strong>5 Unique Posts</strong> - Ready for Twitter</li>
-                        <li><strong>Viral Formats</strong> - Based on 2K-658K view posts</li>
-                        <li><strong>Trading Focus</strong> - Psychology, strategy, markets</li>
-                        <li><strong>PDF + Text</strong> - Easy to copy & paste</li>
+                    <h3>Output</h3>
+                    <ul class="info-list">
+                        <li>5 unique posts</li>
+                        <li>Trading psychology</li>
+                        <li>Market commentary</li>
+                        <li>Educational content</li>
+                        <li>PDF + text format</li>
                     </ul>
                 </div>
             </div>
@@ -261,9 +436,9 @@ HTML_TEMPLATE = """
             <div class="card">
                 <h2>Generated Files</h2>
                 <div class="files-list" id="filesList">
-                    <p style="color: #657786; text-align: center; padding: 40px;">
-                        No files yet. Generate your first batch!
-                    </p>
+                    <div class="empty-state">
+                        No files yet
+                    </div>
                 </div>
             </div>
         </div>
@@ -272,7 +447,7 @@ HTML_TEMPLATE = """
     <div class="modal" id="postsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Generated Posts</h2>
+                <h2>Posts</h2>
                 <button class="modal-close" onclick="closeModal()">Close</button>
             </div>
             <div id="postsContainer"></div>
@@ -300,7 +475,7 @@ HTML_TEMPLATE = """
                 if (data.success) {
                     successMsg.classList.add('active');
                     loadFiles();
-                    setTimeout(() => successMsg.classList.remove('active'), 5000);
+                    setTimeout(() => successMsg.classList.remove('active'), 3000);
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -308,7 +483,7 @@ HTML_TEMPLATE = """
             .catch(error => {
                 btn.disabled = false;
                 loading.classList.remove('active');
-                alert('Error generating content: ' + error);
+                alert('Error: ' + error);
             });
         }
 
@@ -319,7 +494,7 @@ HTML_TEMPLATE = """
                 const filesList = document.getElementById('filesList');
 
                 if (data.files.length === 0) {
-                    filesList.innerHTML = '<p style="color: #657786; text-align: center; padding: 40px;">No files yet. Generate your first batch!</p>';
+                    filesList.innerHTML = '<div class="empty-state">No files yet</div>';
                     return;
                 }
 
@@ -333,8 +508,8 @@ HTML_TEMPLATE = """
                             <div class="file-date">${file.date}</div>
                         </div>
                         <div class="file-actions">
-                            <button class="btn-small btn-view" onclick="viewPosts('${file.txt_path}')">View Posts</button>
-                            <button class="btn-small btn-download" onclick="downloadFile('${file.pdf_path}')">Download PDF</button>
+                            <button class="btn-small" onclick="viewPosts('${file.txt_path}')">View</button>
+                            <button class="btn-small" onclick="downloadFile('${file.pdf_path}')">Download</button>
                         </div>
                     `;
                     filesList.appendChild(fileItem);
@@ -356,7 +531,7 @@ HTML_TEMPLATE = """
                     postItem.innerHTML = `
                         <div class="post-number">Post ${index + 1}</div>
                         <div class="post-content">${post}</div>
-                        <button class="copy-btn" onclick="copyToClipboard(\`${post.replace(/`/g, '\\`')}\`)">📋 Copy to Clipboard</button>
+                        <button class="copy-btn" onclick="copyToClipboard(\`${post.replace(/`/g, '\\`')}\`)">Copy</button>
                     `;
                     container.appendChild(postItem);
                 });
@@ -375,7 +550,7 @@ HTML_TEMPLATE = """
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('✓ Copied to clipboard!');
+                alert('Copied');
             });
         }
 
@@ -475,11 +650,8 @@ def download_file(filename):
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("Twitter Content Generator - Vercel Optimized")
-    print("Generates 5 posts in ~7-10 seconds")
     print("="*60)
-    print("\nStarting web server...")
-    print("Open your browser to: http://localhost:5000")
-    print("\nPress Ctrl+C to stop")
+    print("\nStarting server at http://localhost:5000")
     print("="*60 + "\n")
 
     app.run(debug=False, host='0.0.0.0', port=5000)

@@ -1,18 +1,20 @@
 """
-Web interface for Twitter Content Generator - VERCEL OPTIMIZED
+Web interface for Twitter Content Generator - VERCEL SERVERLESS
 Clean, zen, black and white design
+No file I/O - works in read-only serverless environment
 """
-from flask import Flask, render_template_string, jsonify, send_file, request
+from flask import Flask, render_template_string, jsonify, request
 import os
-from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
-from twitter_content_generator_vercel import TwitterContentGenerator
-import glob
+from twitter_content_generator_serverless import TwitterContentGenerator
 
 load_dotenv()
 
 app = Flask(__name__)
+
+# In-memory storage for generated posts (lost on restart, but that's ok for serverless)
+posts_cache = []
 
 # HTML Template - Clean Black & White Zen Design
 HTML_TEMPLATE = """
@@ -435,10 +437,10 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card">
-                <h2>Generated Files</h2>
+                <h2>Generated Posts</h2>
                 <div class="files-list" id="filesList">
                     <div class="empty-state">
-                        No files yet
+                        Generate posts to see them here
                     </div>
                 </div>
             </div>
@@ -475,7 +477,7 @@ HTML_TEMPLATE = """
 
                 if (data.success) {
                     successMsg.classList.add('active');
-                    loadFiles();
+                    displayPosts(data.posts);
                     setTimeout(() => successMsg.classList.remove('active'), 3000);
                 } else {
                     alert('Error: ' + data.error);
@@ -488,65 +490,61 @@ HTML_TEMPLATE = """
             });
         }
 
-        function loadFiles() {
-            fetch('/files')
+        function displayPosts(posts) {
+            const filesList = document.getElementById('filesList');
+
+            if (!posts || posts.length === 0) {
+                filesList.innerHTML = '<div class="empty-state">No posts generated</div>';
+                return;
+            }
+
+            filesList.innerHTML = '';
+            posts.forEach((post, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-name">Post ${post.number}</div>
+                        <div class="file-date">${post.content.substring(0, 60)}...</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn-small" onclick='viewPost(${JSON.stringify(post.content)})'>View</button>
+                        <button class="btn-small" onclick='copyToClipboard(\`${post.content.replace(/`/g, '\\`')}\`)'>Copy</button>
+                    </div>
+                `;
+                filesList.appendChild(fileItem);
+            });
+        }
+
+        function viewPost(content) {
+            const modal = document.getElementById('postsModal');
+            const container = document.getElementById('postsContainer');
+
+            container.innerHTML = '';
+            const postItem = document.createElement('div');
+            postItem.className = 'post-item';
+            postItem.innerHTML = `
+                <div class="post-content">${content}</div>
+                <button class="copy-btn" onclick='copyToClipboard(\`${content.replace(/`/g, '\\`')}\`)'>Copy</button>
+            `;
+            container.appendChild(postItem);
+            modal.classList.add('active');
+        }
+
+        function loadPosts() {
+            fetch('/posts')
             .then(response => response.json())
             .then(data => {
-                const filesList = document.getElementById('filesList');
-
-                if (data.files.length === 0) {
-                    filesList.innerHTML = '<div class="empty-state">No files yet</div>';
-                    return;
+                if (data.posts && data.posts.length > 0) {
+                    displayPosts(data.posts);
                 }
-
-                filesList.innerHTML = '';
-                data.files.forEach(file => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <div class="file-info">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-date">${file.date}</div>
-                        </div>
-                        <div class="file-actions">
-                            <button class="btn-small" onclick="viewPosts('${file.txt_path}')">View</button>
-                            <button class="btn-small" onclick="downloadFile('${file.pdf_path}')">Download</button>
-                        </div>
-                    `;
-                    filesList.appendChild(fileItem);
-                });
             });
         }
 
-        function viewPosts(txtPath) {
-            fetch(`/view/${txtPath}`)
-            .then(response => response.json())
-            .then(data => {
-                const modal = document.getElementById('postsModal');
-                const container = document.getElementById('postsContainer');
-
-                container.innerHTML = '';
-                data.posts.forEach((post, index) => {
-                    const postItem = document.createElement('div');
-                    postItem.className = 'post-item';
-                    postItem.innerHTML = `
-                        <div class="post-number">Post ${index + 1}</div>
-                        <div class="post-content">${post}</div>
-                        <button class="copy-btn" onclick="copyToClipboard(\`${post.replace(/`/g, '\\`')}\`)">Copy</button>
-                    `;
-                    container.appendChild(postItem);
-                });
-
-                modal.classList.add('active');
-            });
-        }
+        loadPosts();
 
         function closeModal() {
             document.getElementById('postsModal').classList.remove('active');
-        }
-
-        function downloadFile(pdfPath) {
-            window.location.href = `/download/${pdfPath}`;
         }
 
         function copyToClipboard(text) {
@@ -554,8 +552,6 @@ HTML_TEMPLATE = """
                 alert('Copied');
             });
         }
-
-        setInterval(loadFiles, 10000);
     </script>
 </body>
 </html>
@@ -573,80 +569,29 @@ def generate():
             return jsonify({'success': False, 'error': 'API key not configured'})
 
         generator = TwitterContentGenerator(api_key)
-        success = generator.run_daily_generation()
+        posts = generator.generate_posts()
 
-        return jsonify({'success': success})
+        # Store in memory cache
+        global posts_cache
+        posts_cache = posts
+
+        # Return posts directly
+        return jsonify({
+            'success': True,
+            'posts': posts,
+            'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/files')
-def list_files():
-    output_folder = Path('Output')
-    if not output_folder.exists():
-        return jsonify({'files': []})
+@app.route('/posts')
+def get_posts():
+    """Return cached posts"""
+    global posts_cache
+    if not posts_cache:
+        return jsonify({'posts': [], 'message': 'No posts generated yet'})
 
-    pdf_files = sorted(output_folder.glob('Twitter_Posts_*.pdf'), reverse=True)
-
-    files = []
-    for pdf_file in pdf_files:
-        txt_file = pdf_file.with_suffix('.txt')
-        date_str = pdf_file.stem.split('_')[-1]
-
-        try:
-            date_obj = datetime.strptime(date_str, '%Y%m%d')
-            formatted_date = date_obj.strftime('%B %d, %Y')
-        except:
-            formatted_date = date_str
-
-        files.append({
-            'name': pdf_file.name,
-            'date': formatted_date,
-            'pdf_path': pdf_file.name,
-            'txt_path': txt_file.name if txt_file.exists() else None
-        })
-
-    return jsonify({'files': files})
-
-@app.route('/view/<filename>')
-def view_file(filename):
-    try:
-        filepath = Path('Output') / filename
-        if not filepath.exists():
-            return jsonify({'error': 'File not found'}), 404
-
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        posts = []
-        lines = content.split('\n')
-        current_post = []
-
-        for line in lines:
-            if line.strip().startswith(('1.', '2.', '3.', '4.', '5.')):
-                if current_post:
-                    posts.append('\n'.join(current_post).strip())
-                current_post = [line.split('.', 1)[1].strip() if '.' in line else line]
-            elif line.strip() == '-' * 60:
-                if current_post:
-                    posts.append('\n'.join(current_post).strip())
-                    current_post = []
-            elif line.strip() and not line.startswith('=') and 'Daily Twitter' not in line and 'Date:' not in line and 'Time:' not in line:
-                current_post.append(line)
-
-        if current_post:
-            posts.append('\n'.join(current_post).strip())
-
-        return jsonify({'posts': posts})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    filepath = Path('Output') / filename
-    if not filepath.exists():
-        return "File not found", 404
-
-    return send_file(filepath, as_attachment=True)
+    return jsonify({'posts': posts_cache})
 
 if __name__ == '__main__':
     print("\n" + "="*60)
